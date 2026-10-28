@@ -60,6 +60,8 @@ Tout le reste du comportement est conservé à l'identique, y compris les partic
 ### Pistes d'amélioration
 
 * Séparer les couches en projets distincts (Domain / Application / Infrastructure / Api) pour que le compilateur
-  garantisse le sens des dépendances.
+  garantisse le sens des dépendances (Clean Architecture). Non fait ici volontairement : `INotificationService`,
+  qui appartiendrait à la couche Application, ne doit pas être modifié (consigne de l'exercice), et un découpage
+  en 4 projets serait disproportionné pour une seule fonctionnalité.
 * Monter en version .NET (le projet cible .NET 7, qui n'est plus supporté) et utiliser `TimeProvider` (.NET 8).
 * Ajouter de la journalisation (`ILogger`) dans le service applicatif.
