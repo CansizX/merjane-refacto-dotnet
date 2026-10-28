@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -16,13 +17,13 @@ namespace Refacto.Dotnet.Controllers.Tests.Controllers
     /// to lock the existing behaviour before any refactoring.
     /// </summary>
     [Collection("Sequential")]
-    public class MyControllerIntegrationTests : IClassFixture<WebApplicationFactory<Program>>
+    public class OrdersControllerIntegrationTests : IClassFixture<WebApplicationFactory<Program>>
     {
         private readonly WebApplicationFactory<Program> _factory;
         private readonly AppDbContext _context;
         private readonly Mock<INotificationService> _mockNotificationService;
 
-        public MyControllerIntegrationTests(WebApplicationFactory<Program> factory)
+        public OrdersControllerIntegrationTests(WebApplicationFactory<Program> factory)
         {
             _mockNotificationService = new Mock<INotificationService>();
 
@@ -125,6 +126,17 @@ namespace Refacto.Dotnet.Controllers.Tests.Controllers
             _mockNotificationService.Verify(n => n.SendOutOfStockNotification("Strawberry"), Times.Once());
             _mockNotificationService.Verify(n => n.SendOutOfStockNotification("Chestnut"), Times.Once());
             _mockNotificationService.Verify(n => n.SendExpirationNotification("Yogurt", products[4].ExpiryDate!.Value), Times.Once());
+            _mockNotificationService.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ProcessOrder_WhenOrderDoesNotExist_ShouldReturnNotFound()
+        {
+            HttpClient client = _factory.CreateClient();
+
+            HttpResponseMessage response = await client.PostAsync("/orders/999/processOrder", null);
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             _mockNotificationService.VerifyNoOtherCalls();
         }
 
