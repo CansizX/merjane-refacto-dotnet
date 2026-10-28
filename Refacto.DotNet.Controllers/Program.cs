@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Refacto.DotNet.Controllers.Database.Context;
 using Refacto.DotNet.Controllers.Services;
 using Refacto.DotNet.Controllers.Services.Impl;
+using Refacto.DotNet.Controllers.Services.Products;
+using Refacto.DotNet.Controllers.Services.Time;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -11,8 +13,11 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddSingleton<IDateTimeProvider, SystemDateTimeProvider>();
+builder.Services.AddScoped<IProductOrderHandler, NormalProductHandler>();
+builder.Services.AddScoped<IProductOrderHandler, SeasonalProductHandler>();
+builder.Services.AddScoped<IProductOrderHandler, ExpirableProductHandler>();
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     _ = options.UseInMemoryDatabase($"InMemoryDb");
